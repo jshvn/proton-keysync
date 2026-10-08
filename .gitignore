@@ -1,0 +1,5 @@
+node_modules/
+.cloudflare/
+
+# The local secrets file, if one is ever needed; never in the repo.
+.dev.vars

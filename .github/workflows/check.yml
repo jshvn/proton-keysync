@@ -1,0 +1,27 @@
+name: check
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+env:
+  DO_NOT_TRACK: '1'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      # Generates the Env types from cloudflare.config.ts, which is gitignored. tsc needs
+      # it, and it also proves cf still evaluates the config after an edit.
+      - run: npx cf workers types
+      - run: npx tsc --noEmit
+      # Formatting only -- biome.json enables no lint rules.
+      - run: npx biome check .
+      - run: npx vitest run
+      - run: npx cf deploy --dry-run

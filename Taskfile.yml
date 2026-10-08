@@ -1,0 +1,76 @@
+# Common commands. Bare `task` prints the menu; `task --list` is the generated view.
+#
+# Deploys are automatic: Workers Builds deploys every push to main from the connected
+# repository. Everything here is a local check, except `task deploy`, which needs cf
+# credentials of its own -- `npx cf auth login` once, or CLOUDFLARE_API_TOKEN in the environment.
+version: '3'
+
+env:
+  # cf reports usage by default, including which agent harness runs it.
+  DO_NOT_TRACK: '1'
+
+tasks:
+  # The menu. ponytail: hand-maintained listing -- go-task can neither group nor annotate,
+  # so a new task means a line below. `task --list` stays the generated view.
+  default:
+    desc: Print the menu - what to run by hand, grouped
+    silent: true
+    cmds:
+      - |
+        b=$(printf '\033[1m'); c=$(printf '\033[1;36m'); d=$(printf '\033[2m'); r=$(printf '\033[0m')
+        printf '%s\n' \
+          "" \
+          "${b}proton-keysync${r}   ${d}pushes the keys Proton serves to public keyservers, from a button${r}" \
+          "" \
+          "${c}checks${r}" \
+          "  task check        Everything CI runs: types, format, tests, dry-run deploy" \
+          "  task typecheck    cf workers types && tsc --noEmit" \
+          "  task format       Fix formatting in place ${d}(biome check --write)${r}" \
+          "  task test         vitest -- the sync against fake servers" \
+          "  task clean        Delete node_modules and .cloudflare, where the generated types and builds live" \
+          "" \
+          "${c}cloudflare -- needs cf credentials${r}" \
+          "  task deploy       Deploy by hand; a push to main does this through Workers Builds" \
+          "                    ${d}logs are in the dashboard under the Worker's Logs tab${r}" \
+          ""
+
+  installed:
+    internal: true
+    status: ['test -x node_modules/.bin/cf']
+    cmds:
+      - 'echo "node_modules is missing -- npm ci"'
+      - npm ci
+
+  check:
+    desc: Everything CI runs - types, format, tests, dry-run deploy
+    deps: [installed]
+    cmds:
+      - {task: typecheck}
+      - npm run format
+      - {task: test}
+      - npx cf deploy --dry-run
+
+  test:
+    desc: vitest - the sync against fake servers
+    deps: [installed]
+    cmds: [npm test]
+
+  typecheck:
+    desc: cf workers types && tsc --noEmit
+    deps: [installed]
+    cmds: [npm run typecheck]
+
+  format:
+    desc: Fix formatting in place - biome check --write, no lint rules are enabled
+    deps: [installed]
+    cmds: [npm run format:fix]
+
+  clean:
+    desc: Delete node_modules and .cloudflare, where the generated types and builds live - the next task rebuilds
+    cmds: [rm -rf node_modules .cloudflare]
+
+  deploy:
+    desc: Deploy the Worker to Cloudflare
+    deps: [installed]
+    cmds: [npm run deploy]
+

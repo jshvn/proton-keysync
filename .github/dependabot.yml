@@ -1,0 +1,18 @@
+# One grouped PR per ecosystem per week. `check` gates them: cf workers types, tsc, biome,
+# vitest, and a deploy dry-run.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      dependencies:
+        patterns: ['*']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']
