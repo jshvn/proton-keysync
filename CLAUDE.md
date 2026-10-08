@@ -15,8 +15,9 @@ every push to `main`. `README.md` is for users. This file is the design.
   that fails ends the press for that address with no push. What goes to a keyserver is
   that key as the library writes it.
 - A keyserver is current when its copy, read the same way, holds every packet that is the
-  key's own: material, user IDs, subkeys, and the signatures the key made on itself.
-  Certifications by other keys are not counted.
+  key's own: material, user IDs, subkeys, and the signatures the key made on itself. A
+  signature counts by its signed part, since keyservers add unsigned trailer subpackets of
+  their own. Certifications by other keys are not counted.
 - Three modes, one code path: `status` and `dry` write nothing; `sync` pushes everywhere,
   then compares.
 - Every request needs an identity from Cloudflare Access (`ctx.access`), which the platform

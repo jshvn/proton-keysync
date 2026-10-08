@@ -37,6 +37,20 @@ const someone = await openpgp.generateKey({
 })
 /** What the source serves: the key with a certification by someone else on it. */
 const SOURCE_KEY = (await KEY.signAllUsers([someone.privateKey])).armor()
+/**
+ * A copy as keys.openpgp.org serves one: every signature's unsigned trailer gained the issuer
+ * fingerprint subpacket. The signed bytes are untouched.
+ */
+const TRAILED_KEY = await (async () => {
+  const k = await openpgp.readKey({ armoredKey: CURRENT_KEY })
+  const fpr = Uint8Array.from(KEY.getFingerprint().match(/../g) ?? [], (h) => parseInt(h, 16))
+  for (const p of k.toPacketList()) {
+    if (p instanceof openpgp.SignaturePacket) {
+      p.unhashedSubpackets.push({ type: 33, critical: false, body: new Uint8Array([4, ...fpr]) })
+    }
+  }
+  return k.armor()
+})()
 /** The key with one bit flipped in its last signature. */
 const DAMAGED_KEY = await (async () => {
   const b = Uint8Array.from(KEY.write())
@@ -110,6 +124,16 @@ describe("fetch status", () => {
     expect(key?.servers["https://gone.test"]).toEqual({
       state: "missing",
       detail: "not on this server",
+    })
+  })
+
+  it("counts a signature by its signed part, however a server rewrote its trailer", async () => {
+    expect(TRAILED_KEY).not.toBe(CURRENT_KEY)
+    answers[`${HOCKEYPUCK}/pks/lookup?op=get`] = () => new Response(TRAILED_KEY)
+    const report = await sync(env(), "status", USER)
+    expect(report.keys[0]?.servers[HOCKEYPUCK]).toEqual({
+      state: "current",
+      detail: `holds all ${N} packets`,
     })
   })
 

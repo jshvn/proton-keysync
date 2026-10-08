@@ -9,7 +9,7 @@
 // keyserver is current when its copy, read the same way, holds every packet that is the
 // key's own.
 
-import { type Key, readKey, readKeys, type SignaturePacket } from "openpgp"
+import { type Key, readKey, readKeys, SignaturePacket } from "openpgp"
 
 export type Env = {
   SOURCE: string
@@ -91,9 +91,16 @@ const ownOf = (key: Key) => {
   return { packets, signed }
 }
 
-/** A packet's identity for comparison: its bytes, as the library writes them. */
-const identity = (p: { write(): Uint8Array }): string =>
-  Array.from(p.write(), (b) => b.toString(16).padStart(2, "0")).join("")
+/**
+ * A packet's identity for comparison. A signature is its signed part: keyservers add unsigned
+ * subpackets of their own to the trailer (keys.openpgp.org appends the issuer fingerprint),
+ * and those bytes say nothing about whether the server holds the signature. Any other
+ * packet is its bytes as the library writes them.
+ */
+const identity = (p: { write(): Uint8Array }): string => {
+  const bytes = p instanceof SignaturePacket ? (p.signatureData ?? p.write()) : p.write()
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
+}
 
 /**
  * The source's key as a press carries it: read and verified, written out by the library,
