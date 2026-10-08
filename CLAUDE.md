@@ -40,8 +40,6 @@ every push to `main`. `README.md` is for users. This file is the design.
   not here: they are the `ADDRESSES` secret on the Worker, so no address is in the repo.
 - `vite.config.ts` -- hands the build to Cloudflare's plugin; `vitest.config.ts` keeps the
   tests under plain Node.
-- `op.env` -- the 1Password references `task deploy` resolves at run time. Nothing secret
-  is in it; the token and account id live in the vault's `proton-keysync` item.
 
 ## Checks
 

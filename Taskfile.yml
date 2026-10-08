@@ -1,8 +1,7 @@
 # Common commands. Bare `task` prints the menu; `task --list` is the generated view.
 #
 # Deploys are automatic: Workers Builds deploys every push to main from the connected
-# repository. Everything here is a local check, except `task deploy`, which reads its
-# credentials from 1Password by name: the op:// references in `op.env`.
+# repository. Everything here is a local check.
 version: '3'
 
 env:
@@ -28,10 +27,6 @@ tasks:
           "  task format       Fix formatting in place ${d}(biome check --write)${r}" \
           "  task test         vitest -- the sync against fake servers" \
           "  task clean        Delete node_modules and .cloudflare, where the generated types and builds live" \
-          "" \
-          "${c}cloudflare -- needs 1Password${r}" \
-          "  task deploy       Deploy by hand, credentials from 1Password; a push to main does this through Workers Builds" \
-          "                    ${d}logs are in the dashboard under the Worker's Logs tab${r}" \
           ""
 
   installed:
@@ -69,8 +64,4 @@ tasks:
     desc: Delete node_modules and .cloudflare, where the generated types and builds live - the next task rebuilds
     cmds: [rm -rf node_modules .cloudflare]
 
-  deploy:
-    desc: Deploy the Worker to Cloudflare, with the credentials op.env names
-    deps: [installed]
-    cmds: [op run --env-file=op.env -- npm run deploy]
 

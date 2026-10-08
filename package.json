@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "deploy": "cf deploy",
     "types": "cf workers types",
     "typecheck": "cf workers types && tsc --noEmit",
     "format": "biome check .",
