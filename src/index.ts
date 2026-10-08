@@ -32,7 +32,14 @@ export default {
       // A browser names the page that submitted the form. Another site's page, carrying this
       // user's Access cookie, is refused: only this page presses these buttons.
       const origin = request.headers.get("origin")
-      if (origin && origin !== url.origin) return new Response("cross-site press", { status: 403 })
+      if (origin && origin !== url.origin) {
+        return new Response(
+          `cross-site press: the browser says ${origin}, the page is ${url.origin}`,
+          {
+            status: 403,
+          },
+        )
+      }
       const action = await request
         .formData()
         .then((form) => form.get("action"))
