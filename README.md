@@ -33,8 +33,9 @@ the page shows you signed in as is a different thing: that one comes from Cloudf
    `cloudflare.config.ts`.
 2. In the Cloudflare dashboard, create the Worker from the repository: Workers & Pages,
    Create, connect the repository, and set the deploy command to `npx cf deploy`. Every push
-   to `main` deploys from then on. By hand instead: `npm ci`, `npx cf auth login`,
-   `task deploy`.
+   to `main` deploys from then on. By hand instead: `npm ci`, then `task deploy`, which reads a
+   Cloudflare token and account id from the 1Password item `proton-keysync` (fields
+   `cloudflare/token` and `cloudflare/account_id`) through the references in `op.env`.
 3. On the Worker's Settings page, under Variables and Secrets, add a secret named
    `ADDRESSES` holding your addresses, comma-separated.
 4. On the Worker's Access tab, protect all hostnames with a policy that allows your email.
