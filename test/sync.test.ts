@@ -250,6 +250,8 @@ describe("fetch handler", () => {
     const home = await worker.fetch(new Request(`${SITE}/`), e, ctx(USER))
     expect(home.status).toBe(200)
     expect(home.headers.get("content-security-policy")).toContain("frame-ancestors 'none'")
+    // "no-referrer" would make the browser send `Origin: null` on the page's own presses.
+    expect(home.headers.get("referrer-policy")).toBe("same-origin")
     const before = await home.text()
     expect(before).toContain(EMAIL)
     expect(before).toContain("Press a button")

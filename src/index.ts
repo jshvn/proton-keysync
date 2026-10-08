@@ -12,7 +12,10 @@ const HEADERS = {
   "content-security-policy":
     "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'",
   "x-content-type-options": "nosniff",
-  "referrer-policy": "no-referrer",
+  // Not "no-referrer": under that policy a browser sends `Origin: null` on the page's own form
+  // posts (Fetch, "append a request Origin header"), and the press below would read as
+  // cross-site. "same-origin" still sends no referrer anywhere else.
+  "referrer-policy": "same-origin",
   "cache-control": "no-store",
 }
 
