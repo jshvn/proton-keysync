@@ -31,7 +31,7 @@ tasks:
         }
         note() { printf '  %-26s %s\n' '' "$d$1$r"; }
 
-        printf '\n%s   %s\n' "${b}proton-keysync${r}" "${d}pushes the keys Proton serves to public keyservers, from a button${r}"
+        printf '\n%s   %s\n' "${b}jshvn/proton-keysync${r}" "${d}pushes the keys Proton serves to public keyservers, from a button${r}"
 
         group checks 'offline, no credentials'
         row 'task check' 'Everything CI runs: types, format, tests, dry-run deploy' 'then this menu against the tasks, which CI does not run'
