@@ -44,3 +44,7 @@ every push to `main`. `README.md` is for users. This file is the design.
 ## Checks
 
 `task check`: `cf workers types`, `tsc`, Biome formatting, Vitest, `cf deploy --dry-run`.
+
+Updates arrive through Renovate: `renovate.json` extends the shared `jshvn/renovate-config`
+preset, so the npm packages, `.node-version` and the actions get one Monday pull request for
+their minor and patch updates and one per major, each assigned to jshvn.
